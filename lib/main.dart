@@ -8,7 +8,7 @@ import 'package:crypto/crypto.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart' show InputImage, RecognizedText, TextRecognizer, TextRecognizerScript;
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart' show InputImage, RecognizedText, TextRecognizer;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -1693,7 +1693,7 @@ class _WholesaleState extends State<WholesalePage> {
       info = null;
     });
     try {
-      final rec = TextRecognizer(script: TextRecognizerScript.latin);
+      final rec = TextRecognizer();
       final res = await rec.processImage(InputImage.fromFilePath(x.path));
       await rec.close();
       final r = parseWholesale(res);
