@@ -57,7 +57,14 @@ open('android/app/proguard-rules.pro', 'w', encoding='utf-8').write(
     '-dontwarn com.google.mlkit.vision.text.chinese.**\n'
     '-dontwarn com.google.mlkit.vision.text.devanagari.**\n'
     '-dontwarn com.google.mlkit.vision.text.japanese.**\n'
-    '-dontwarn com.google.mlkit.vision.text.korean.**\n')
+    '-dontwarn com.google.mlkit.vision.text.korean.**\n'
+    '-dontobfuscate\n'
+    '-dontoptimize\n'
+    '-dontshrink\n'
+    '-keep class com.google.mlkit.** { *; }\n'
+    '-keep class com.google.android.gms.internal.mlkit_** { *; }\n'
+    '-keep class com.google_mlkit_** { *; }\n'
+    '-keep class * implements com.google.firebase.components.ComponentRegistrar\n')
 for f, line in (('android/app/build.gradle.kts', 'proguardFiles("proguard-rules.pro")'), ('android/app/build.gradle', "proguardFiles 'proguard-rules.pro'")):
     if os.path.exists(f):
         t = open(f, encoding='utf-8').read()
