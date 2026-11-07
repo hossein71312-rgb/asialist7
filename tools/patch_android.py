@@ -51,3 +51,20 @@ if os.path.exists('android/key.properties'):
     print('release signing enabled')
 else:
     print('NO KEYSTORE: building with debug key (not for stores)')
+
+# --- R8 keep rules for ML Kit (optional script recognizers are not bundled)
+open('android/app/proguard-rules.pro', 'w', encoding='utf-8').write(
+    '-dontwarn com.google.mlkit.vision.text.chinese.**\n'
+    '-dontwarn com.google.mlkit.vision.text.devanagari.**\n'
+    '-dontwarn com.google.mlkit.vision.text.japanese.**\n'
+    '-dontwarn com.google.mlkit.vision.text.korean.**\n')
+for f, line in (('android/app/build.gradle.kts', 'proguardFiles("proguard-rules.pro")'), ('android/app/build.gradle', "proguardFiles 'proguard-rules.pro'")):
+    if os.path.exists(f):
+        t = open(f, encoding='utf-8').read()
+        i = t.index('buildTypes {')
+        j = t.index('release {', i)
+        k = j + len('release {')
+        t = t[:k] + '\n            ' + line + t[k:]
+        open(f, 'w', encoding='utf-8').write(t)
+        print('proguard rules added to', f)
+        break
