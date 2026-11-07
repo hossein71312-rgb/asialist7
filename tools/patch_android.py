@@ -52,7 +52,7 @@ if os.path.exists('android/key.properties'):
 else:
     print('NO KEYSTORE: building with debug key (not for stores)')
 
-# --- R8 keep rules for ML Kit (optional script recognizers are not bundled)
+# --- R8: ML Kit needs its classes kept; also try to switch minify off for release
 open('android/app/proguard-rules.pro', 'w', encoding='utf-8').write(
     '-dontwarn com.google.mlkit.vision.text.chinese.**\n'
     '-dontwarn com.google.mlkit.vision.text.devanagari.**\n'
@@ -60,20 +60,22 @@ open('android/app/proguard-rules.pro', 'w', encoding='utf-8').write(
     '-dontwarn com.google.mlkit.vision.text.korean.**\n'
     '-dontwarn com.google.android.play.core.**\n'
     '-dontwarn io.flutter.embedding.**\n'
-    '-dontobfuscate\n'
-    '-dontoptimize\n'
-    '-dontshrink\n'
     '-keep class com.google.mlkit.** { *; }\n'
     '-keep class com.google.android.gms.internal.mlkit_** { *; }\n'
     '-keep class com.google_mlkit_** { *; }\n'
     '-keep class * implements com.google.firebase.components.ComponentRegistrar\n')
-for f, line in (('android/app/build.gradle.kts', 'proguardFiles("proguard-rules.pro")'), ('android/app/build.gradle', "proguardFiles 'proguard-rules.pro'")):
+for f, kts in (('android/app/build.gradle.kts', True), ('android/app/build.gradle', False)):
     if os.path.exists(f):
         t = open(f, encoding='utf-8').read()
         i = t.index('buildTypes {')
-        j = t.index('release {', i)
-        k = j + len('release {')
-        t = t[:k] + '\n            ' + line + t[k:]
-        open(f, 'w', encoding='utf-8').write(t)
-        print('proguard rules added to', f)
+        head, tail = t[:i], t[i:]
+        tail = re.sub(r'\n[ \t]*(isMinifyEnabled|isShrinkResources|minifyEnabled|shrinkResources)\b[^\n]*', '', tail)
+        j = tail.index('release {') + len('release {')
+        if kts:
+            ins = '\n            isMinifyEnabled = false\n            isShrinkResources = false\n            proguardFiles("proguard-rules.pro")'
+        else:
+            ins = "\n            minifyEnabled false\n            shrinkResources false\n            proguardFiles 'proguard-rules.pro'"
+        tail = tail[:j] + ins + tail[j:]
+        open(f, 'w', encoding='utf-8').write(head + tail)
+        print('release minify disabled + proguard rules in', f)
         break
