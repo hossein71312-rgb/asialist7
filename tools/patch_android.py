@@ -58,6 +58,8 @@ open('android/app/proguard-rules.pro', 'w', encoding='utf-8').write(
     '-dontwarn com.google.mlkit.vision.text.devanagari.**\n'
     '-dontwarn com.google.mlkit.vision.text.japanese.**\n'
     '-dontwarn com.google.mlkit.vision.text.korean.**\n'
+    '-dontwarn com.google.android.play.core.**\n'
+    '-dontwarn io.flutter.embedding.**\n'
     '-dontobfuscate\n'
     '-dontoptimize\n'
     '-dontshrink\n'
